@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="620" height="640" viewBox="0 0 620 640">
+<rect width="100%" height="100%" fill="#f7f2e8"/>
+<text x="310.0" y="38" text-anchor="middle" font-family="Hiragino Sans GB, Arial Unicode MS, sans-serif" font-size="24" font-weight="700">7x7 围棋棋盘显示示例</text>
+<text x="310.0" y="66" text-anchor="middle" font-family="Hiragino Sans GB, Arial Unicode MS, sans-serif" font-size="14" fill="#555">X 表示黑棋，O 表示白棋</text>
+<rect x="106.0" y="88" width="408" height="408" rx="8" fill="#d8aa63" stroke="#8b5a2b"/>
+<line x1="142.0" y1="124" x2="478.0" y2="124" stroke="#3c2a17" stroke-width="2"/>
+<line x1="142.0" y1="124" x2="142.0" y2="460" stroke="#3c2a17" stroke-width="2"/>
+<text x="142.0" y="82" text-anchor="middle" font-family="Arial" font-size="14">A</text>
+<text x="98.0" y="129" text-anchor="middle" font-family="Arial" font-size="14">1</text>
+<line x1="142.0" y1="180" x2="478.0" y2="180" stroke="#3c2a17" stroke-width="2"/>
+<line x1="198.0" y1="124" x2="198.0" y2="460" stroke="#3c2a17" stroke-width="2"/>
+<text x="198.0" y="82" text-anchor="middle" font-family="Arial" font-size="14">B</text>
+<text x="98.0" y="185" text-anchor="middle" font-family="Arial" font-size="14">2</text>
+<line x1="142.0" y1="236" x2="478.0" y2="236" stroke="#3c2a17" stroke-width="2"/>
+<line x1="254.0" y1="124" x2="254.0" y2="460" stroke="#3c2a17" stroke-width="2"/>
+<text x="254.0" y="82" text-anchor="middle" font-family="Arial" font-size="14">C</text>
+<text x="98.0" y="241" text-anchor="middle" font-family="Arial" font-size="14">3</text>
+<line x1="142.0" y1="292" x2="478.0" y2="292" stroke="#3c2a17" stroke-width="2"/>
+<line x1="310.0" y1="124" x2="310.0" y2="460" stroke="#3c2a17" stroke-width="2"/>
+<text x="310.0" y="82" text-anchor="middle" font-family="Arial" font-size="14">D</text>
+<text x="98.0" y="297" text-anchor="middle" font-family="Arial" font-size="14">4</text>
+<line x1="142.0" y1="348" x2="478.0" y2="348" stroke="#3c2a17" stroke-width="2"/>
+<line x1="366.0" y1="124" x2="366.0" y2="460" stroke="#3c2a17" stroke-width="2"/>
+<text x="366.0" y="82" text-anchor="middle" font-family="Arial" font-size="14">E</text>
+<text x="98.0" y="353" text-anchor="middle" font-family="Arial" font-size="14">5</text>
+<line x1="142.0" y1="404" x2="478.0" y2="404" stroke="#3c2a17" stroke-width="2"/>
+<line x1="422.0" y1="124" x2="422.0" y2="460" stroke="#3c2a17" stroke-width="2"/>
+<text x="422.0" y="82" text-anchor="middle" font-family="Arial" font-size="14">F</text>
+<text x="98.0" y="409" text-anchor="middle" font-family="Arial" font-size="14">6</text>
+<line x1="142.0" y1="460" x2="478.0" y2="460" stroke="#3c2a17" stroke-width="2"/>
+<line x1="478.0" y1="124" x2="478.0" y2="460" stroke="#3c2a17" stroke-width="2"/>
+<text x="478.0" y="82" text-anchor="middle" font-family="Arial" font-size="14">G</text>
+<text x="98.0" y="465" text-anchor="middle" font-family="Arial" font-size="14">7</text>
+<circle cx="310.0" cy="180" r="20" fill="#1b1b1b" stroke="#000" stroke-width="2"/>
+<circle cx="303.0" cy="172" r="5" fill="#444" opacity="0.55"/>
+<circle cx="366.0" cy="180" r="20" fill="#f7f7f7" stroke="#222" stroke-width="2"/>
+<circle cx="359.0" cy="172" r="5" fill="#fff" opacity="0.9"/>
+<circle cx="254.0" cy="236" r="20" fill="#1b1b1b" stroke="#000" stroke-width="2"/>
+<circle cx="247.0" cy="228" r="5" fill="#444" opacity="0.55"/>
+<circle cx="310.0" cy="236" r="20" fill="#f7f7f7" stroke="#222" stroke-width="2"/>
+<circle cx="303.0" cy="228" r="5" fill="#fff" opacity="0.9"/>
+<circle cx="366.0" cy="236" r="20" fill="#1b1b1b" stroke="#000" stroke-width="2"/>
+<circle cx="359.0" cy="228" r="5" fill="#444" opacity="0.55"/>
+<circle cx="254.0" cy="292" r="20" fill="#f7f7f7" stroke="#222" stroke-width="2"/>
+<circle cx="247.0" cy="284" r="5" fill="#fff" opacity="0.9"/>
+<circle cx="366.0" cy="292" r="20" fill="#f7f7f7" stroke="#222" stroke-width="2"/>
+<circle cx="359.0" cy="284" r="5" fill="#fff" opacity="0.9"/>
+<circle cx="254.0" cy="348" r="20" fill="#1b1b1b" stroke="#000" stroke-width="2"/>
+<circle cx="247.0" cy="340" r="5" fill="#444" opacity="0.55"/>
+<circle cx="310.0" cy="348" r="20" fill="#f7f7f7" stroke="#222" stroke-width="2"/>
+<circle cx="303.0" cy="340" r="5" fill="#fff" opacity="0.9"/>
+<circle cx="366.0" cy="348" r="20" fill="#f7f7f7" stroke="#222" stroke-width="2"/>
+<circle cx="359.0" cy="340" r="5" fill="#fff" opacity="0.9"/>
+<circle cx="310.0" cy="404" r="20" fill="#1b1b1b" stroke="#000" stroke-width="2"/>
+<circle cx="303.0" cy="396" r="5" fill="#444" opacity="0.55"/>
+<text x="310.0" y="592" text-anchor="middle" font-family="Hiragino Sans GB, Arial Unicode MS, sans-serif" font-size="16">面积计分：黑 5，白 7；当前：黑方</text>
+</svg>

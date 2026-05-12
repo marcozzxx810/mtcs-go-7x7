@@ -1,0 +1,12 @@
+[project]
+name = "mcts-go-7x7"
+version = "0.1.0"
+description = "A 7x7 Go decision program based on Monte Carlo Tree Search."
+requires-python = ">=3.10"
+dependencies = [
+    "matplotlib>=3.8",
+    "reportlab>=4.0",
+]
+
+[tool.uv]
+package = false

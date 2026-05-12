@@ -1,0 +1,38 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# uv / Python packaging
+dist/
+build/
+*.egg-info/
+
+# macOS
+.DS_Store
+
+# IDE/editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary files
+*.tmp
+*.log
+
+# Generated submission archive
+submission.zip
+
+# Optional: generated local reports/outputs
+# Uncomment these if you do not want generated files in git
+# report.pdf
+# report.docx
+# results/
+# figures/
+# screenshots/
