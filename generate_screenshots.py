@@ -94,11 +94,11 @@ def make_selfplay_board() -> tuple[GoGame, list[str]]:
 
 
 def experiment_svg() -> str:
-    path = Path("results/experiment_results.csv")
+    path = Path(__file__).parent / "results" / "experiment_results.csv"
     rows: list[dict[str, str]] = []
     if path.exists():
         with path.open("r", encoding="utf-8") as file:
-            rows = list(csv.DictReader(file))[:6]
+            rows = list(csv.DictReader(file))
     if not rows:
         rows = [
             {"simulations": "100", "uct_c": "0.5", "black_win_rate": "0.60", "white_win_rate": "0.40", "avg_time_per_move": "0.05", "avg_game_moves": "48", "avg_search_nodes": "101"},
@@ -108,13 +108,13 @@ def experiment_svg() -> str:
         ]
 
     width = 920
-    height = 420
     columns = ["模拟次数", "UCT c", "黑胜率", "白胜率", "每步耗时", "平均步数", "平均节点"]
     keys = ["simulations", "uct_c", "black_win_rate", "white_win_rate", "avg_time_per_move", "avg_game_moves", "avg_search_nodes"]
     col_widths = [90, 70, 85, 85, 95, 95, 105]
     x0 = int((width - sum(col_widths)) / 2)
     y0 = 92
-    row_h = 42
+    row_h = 36
+    height = y0 + row_h * (len(rows) + 1) + 24
 
     lines = [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">',
@@ -136,9 +136,14 @@ def experiment_svg() -> str:
         fill = "#ffffff" if index % 2 == 0 else "#f8fafc"
         for key, width_col in zip(keys, col_widths):
             value = row.get(key, "")
-            if key in {"black_win_rate", "white_win_rate", "avg_time_per_move", "avg_search_nodes"}:
+            if key in {"black_win_rate", "white_win_rate", "avg_time_per_move"}:
                 try:
                     value = f"{float(value):.3f}"
+                except ValueError:
+                    pass
+            elif key in {"avg_game_moves", "avg_search_nodes"}:
+                try:
+                    value = f"{float(value):.1f}"
                 except ValueError:
                     pass
             lines.append(f'<rect x="{x}" y="{y}" width="{width_col}" height="{row_h}" fill="{fill}" stroke="#d2d2d2"/>')

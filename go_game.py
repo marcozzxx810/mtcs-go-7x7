@@ -4,13 +4,13 @@ from collections import deque
 from typing import Iterable, Sequence
 
 
-BOARD_SIZE = 7
+BOARD_SIZE = 7       # default board size (7, 8, or 9 are all supported)
+DEFAULT_KOMI = 6.5   # White's point compensation for moving second
 EMPTY = 0
 BLACK = 1
 WHITE = -1
 DRAW = 0
 PASS_MOVE = None
-MAX_MOVES = BOARD_SIZE * BOARD_SIZE
 
 Move = tuple[int, int] | None
 Board = tuple[tuple[int, ...], ...]
@@ -28,15 +28,37 @@ def player_name(player: int) -> str:
     return "平局"
 
 
-def new_board() -> Board:
-    return tuple(tuple(EMPTY for _ in range(BOARD_SIZE)) for _ in range(BOARD_SIZE))
+def new_board(board_size: int = BOARD_SIZE) -> Board:
+    return tuple(tuple(EMPTY for _ in range(board_size)) for _ in range(board_size))
 
 
 class GoGame:
-    """Immutable 7x7 Go state with simplified Chinese area scoring."""
+    """Immutable Go state for 7×7–9×9 boards with simplified Chinese area scoring.
+
+    Rules implemented
+    -----------------
+    * Chinese area scoring: score = stones on board + empty points enclosed
+      exclusively by that player's stones.
+    * Komi: White receives `komi` points (default 6.5) applied in
+      `winner()` and `final_score()`.
+    * Suicide: illegal (a stone group with zero liberties after captures is
+      rejected in `_next_board_for_move`).
+    * Simple ko: a move that would restore the immediately previous board
+      position is illegal.  Full positional superko is NOT implemented — an
+      acknowledged simplification suitable for this student assignment.
+    * Dead-stone analysis: NOT implemented.  Play is expected to continue
+      until all dead stones are captured before the double-pass.  On small
+      boards this is standard MCTS practice.
+    * Game ends when (a) both players pass consecutively, or (b) the safety
+      cap `max_moves` is reached (default 3 × board_size²) to prevent
+      runaway rollouts.
+    """
 
     __slots__ = (
         "board",
+        "board_size",
+        "komi",
+        "max_moves",
         "current_player",
         "previous_board",
         "consecutive_passes",
@@ -48,13 +70,21 @@ class GoGame:
     def __init__(
         self,
         board: Board | None = None,
+        board_size: int = BOARD_SIZE,
+        komi: float = DEFAULT_KOMI,
+        max_moves: int | None = None,
         current_player: int = BLACK,
         previous_board: Board | None = None,
         consecutive_passes: int = 0,
         move_count: int = 0,
         last_move: Move = None,
     ) -> None:
-        self.board = board if board is not None else new_board()
+        self.board_size = board_size
+        self.komi = komi
+        # Safety cap: 3 × board_size² prevents infinite rollouts; the normal
+        # end condition (consecutive_passes >= 2) fires long before this.
+        self.max_moves = max_moves if max_moves is not None else board_size * board_size * 3
+        self.board = board if board is not None else new_board(board_size)
         self.current_player = current_player
         self.previous_board = previous_board
         self.consecutive_passes = consecutive_passes
@@ -65,6 +95,9 @@ class GoGame:
     def clone(self) -> "GoGame":
         return GoGame(
             board=self.board,
+            board_size=self.board_size,
+            komi=self.komi,
+            max_moves=self.max_moves,
             current_player=self.current_player,
             previous_board=self.previous_board,
             consecutive_passes=self.consecutive_passes,
@@ -73,27 +106,27 @@ class GoGame:
         )
 
     def is_over(self) -> bool:
-        return (
-            self.consecutive_passes >= 2
-            or self.move_count >= MAX_MOVES
-            or all(cell != EMPTY for row in self.board for cell in row)
-        )
+        # Primary end: both players pass consecutively (standard Go ending).
+        if self.consecutive_passes >= 2:
+            return True
+        # Fallback safety cap to prevent unbounded rollouts.
+        return self.move_count >= self.max_moves
 
     def neighbors(self, row: int, col: int) -> Iterable[tuple[int, int]]:
         if row > 0:
             yield row - 1, col
-        if row < BOARD_SIZE - 1:
+        if row < self.board_size - 1:
             yield row + 1, col
         if col > 0:
             yield row, col - 1
-        if col < BOARD_SIZE - 1:
+        if col < self.board_size - 1:
             yield row, col + 1
 
     def empty_points(self) -> list[tuple[int, int]]:
         return [
             (row, col)
-            for row in range(BOARD_SIZE)
-            for col in range(BOARD_SIZE)
+            for row in range(self.board_size)
+            for col in range(self.board_size)
             if self.board[row][col] == EMPTY
         ]
 
@@ -118,7 +151,7 @@ class GoGame:
         if move is PASS_MOVE:
             return True
         row, col = move
-        if not (0 <= row < BOARD_SIZE and 0 <= col < BOARD_SIZE):
+        if not (0 <= row < self.board_size and 0 <= col < self.board_size):
             return False
         if self.board[row][col] != EMPTY:
             return False
@@ -147,6 +180,9 @@ class GoGame:
                 raise ValueError("游戏已经结束，不能继续 pass。")
             return GoGame(
                 board=self.board,
+                board_size=self.board_size,
+                komi=self.komi,
+                max_moves=self.max_moves,
                 current_player=opponent(self.current_player),
                 previous_board=self.board,
                 consecutive_passes=self.consecutive_passes + 1,
@@ -159,6 +195,9 @@ class GoGame:
             raise ValueError(f"非法落子：{format_move(move)}")
         return GoGame(
             board=next_board,
+            board_size=self.board_size,
+            komi=self.komi,
+            max_moves=self.max_moves,
             current_player=opponent(self.current_player),
             previous_board=self.board,
             consecutive_passes=0,
@@ -188,9 +227,11 @@ class GoGame:
 
         own_group, own_liberties = self._collect_group(board_lists, row, col)
         if not own_group or not own_liberties:
-            return None
+            return None  # suicide
 
         next_board = tuple(tuple(board_row) for board_row in board_lists)
+        # Simple ko: reject any move that reproduces the immediately previous
+        # board.  Full positional superko is not implemented.
         if self.previous_board is not None and next_board == self.previous_board:
             return None
         return next_board
@@ -219,12 +260,13 @@ class GoGame:
         return group, liberties
 
     def area_score(self) -> tuple[int, int]:
+        """Return raw area scores (stones + enclosed empty points), komi NOT included."""
         black_score = 0
         white_score = 0
         visited: set[tuple[int, int]] = set()
 
-        for row in range(BOARD_SIZE):
-            for col in range(BOARD_SIZE):
+        for row in range(self.board_size):
+            for col in range(self.board_size):
                 value = self.board[row][col]
                 if value == BLACK:
                     black_score += 1
@@ -238,6 +280,11 @@ class GoGame:
                         white_score += len(region)
 
         return black_score, white_score
+
+    def final_score(self) -> tuple[float, float]:
+        """Return (black_area, white_area_with_komi) for display and winner determination."""
+        black_raw, white_raw = self.area_score()
+        return float(black_raw), float(white_raw) + self.komi
 
     def _empty_region(
         self, row: int, col: int, visited: set[tuple[int, int]]
@@ -261,20 +308,21 @@ class GoGame:
         return region, borders
 
     def winner(self) -> int:
-        black_score, white_score = self.area_score()
-        if black_score > white_score:
+        """Return the winner after applying komi to White's score."""
+        black_score, white_score_with_komi = self.final_score()
+        if black_score > white_score_with_komi:
             return BLACK
-        if white_score > black_score:
+        if white_score_with_komi > black_score:
             return WHITE
         return DRAW
 
     def render(self) -> str:
-        header = "   " + " ".join(chr(ord("A") + col) for col in range(BOARD_SIZE))
+        header = "   " + " ".join(chr(ord("A") + col) for col in range(self.board_size))
         lines = [header]
         symbols = {EMPTY: ".", BLACK: "X", WHITE: "O"}
-        for row in range(BOARD_SIZE):
+        for row in range(self.board_size):
             line = f"{row + 1:>2} " + " ".join(
-                symbols[self.board[row][col]] for col in range(BOARD_SIZE)
+                symbols[self.board[row][col]] for col in range(self.board_size)
             )
             lines.append(line)
         return "\n".join(lines)

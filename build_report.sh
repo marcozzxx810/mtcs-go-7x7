@@ -3,7 +3,5 @@ set -e
 export PATH="$PWD:$PATH"
 
 uv run python generate_screenshots.py
-uv run python experiment.py
 uv run python plot_results.py
 pandoc report.md -o report.pdf --pdf-engine=xelatex
-pandoc report.md -o report.docx

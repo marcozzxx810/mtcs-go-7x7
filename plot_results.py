@@ -110,7 +110,7 @@ def save_win_rate_heatmap(rows: list[dict[str, float]]) -> None:
         ax.tick_params(length=0)
         for row_index, row in enumerate(matrix):
             for col_index, value in enumerate(row):
-                text_color = "white" if value >= 0.55 and cmap == "Greys" else "#111827"
+                text_color = "white" if value >= 0.55 else "#111827"
                 ax.text(
                     col_index,
                     row_index,
@@ -298,6 +298,55 @@ def save_nodes_chart(rows: list[dict[str, float]]) -> None:
     finish_figure(fig, "nodes_vs_simulations.png")
 
 
+def save_score_diff_chart(rows: list[dict[str, float]]) -> None:
+    """Plot average score difference (Black area − White area with komi) vs simulations."""
+    if not any("avg_score_diff" in row for row in rows):
+        return  # Column absent in older CSV files; skip gracefully.
+
+    simulations = [int(value) for value in unique_values(rows, "simulations")]
+    ucts = unique_values(rows, "uct_c")
+
+    fig, ax = plt.subplots(figsize=(8.6, 4.35), dpi=180)
+    ax.axhline(0, color="#94a3b8", linewidth=1.2, linestyle="--", label="势均力敌")
+
+    for uct in ucts:
+        values = [
+            next(row["avg_score_diff"] for row in rows
+                 if int(row["simulations"]) == sim and row["uct_c"] == uct)
+            for sim in simulations
+        ]
+        ax.plot(
+            simulations,
+            values,
+            marker="o",
+            markersize=5,
+            linewidth=1.8,
+            color=UCT_COLORS.get(uct, "#71717a"),
+            label=f"UCT c={uct:g}",
+            alpha=0.95,
+        )
+
+    ax.set_title("平均得分差（黑方面积减白方面积含贴目）", fontsize=15, pad=12)
+    ax.set_xlabel("MCTS 模拟次数")
+    ax.set_ylabel("得分差（正值表示黑方优势）")
+    ax.set_xticks(simulations)
+    ax.grid(axis="y", color="#e4e4e7", linewidth=0.8)
+    ax.grid(axis="x", visible=False)
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.legend(ncol=4, frameon=False, loc="upper center", bbox_to_anchor=(0.5, -0.16))
+    fig.text(
+        0.5,
+        0.01,
+        "虚线表示零分差；正值表示黑方优势，负值表示白方（含贴目）优势。",
+        ha="center",
+        fontsize=10,
+        color="#52525b",
+    )
+    plt.tight_layout()
+    finish_figure(fig, "score_diff_vs_simulations.png")
+
+
 def main() -> None:
     configure_matplotlib()
     rows = read_rows()
@@ -321,6 +370,7 @@ def main() -> None:
         FuncFormatter(lambda value, _pos: f"{value:.0f}"),
     )
     save_nodes_chart(rows)
+    save_score_diff_chart(rows)
     print(f"图表已保存到 {FIGURE_DIR}")
 
 
